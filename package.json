@@ -1,0 +1,13 @@
+{
+  "name": "crysta-home-decor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CRYSTA HOME DECOR — E-commerce website",
+  "scripts": {
+    "scan-products": "node scripts/scan-products.js",
+    "admin": "node scripts/server.js"
+  },
+  "dependencies": {
+    "sharp": "^0.35.3"
+  }
+}

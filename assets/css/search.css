@@ -1,0 +1,121 @@
+.search-section{
+    padding:56px 0 80px;
+    background:var(--bg);
+    min-height:60vh;
+}
+
+.search-container{
+    max-width:1320px;
+    margin:0 auto;
+    padding:0 24px;
+}
+
+.search-header{
+    text-align:center;
+    margin-bottom:44px;
+}
+
+.search-label{
+    display:inline-block;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    color:var(--primary);
+    margin-bottom:10px;
+}
+
+.search-title{
+    font-family:var(--font-display);
+    font-size:clamp(22px,3vw,34px);
+    font-weight:600;
+    color:var(--text);
+    letter-spacing:.5px;
+    margin-bottom:8px;
+}
+
+.search-count{
+    font-size:14px;
+    color:var(--text-muted);
+}
+
+.search-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:24px;
+}
+
+.search-empty{
+    display:none;
+    text-align:center;
+    padding:80px 24px;
+}
+
+.search-empty i{
+    font-size:64px;
+    color:var(--text-muted);
+    margin-bottom:20px;
+}
+
+.search-empty h3{
+    font-family:var(--font-display);
+    font-size:28px;
+    color:var(--text);
+    margin-bottom:12px;
+}
+
+.search-empty p{
+    font-size:15px;
+    color:var(--text-muted);
+    margin-bottom:24px;
+}
+
+.search-back-btn{
+    display:inline-flex;
+    padding:12px 32px;
+    background:var(--primary);
+    color:var(--white);
+    border-radius:50px;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+    transition:background .3s ease, transform .3s ease;
+}
+
+.search-back-btn:hover{
+    background:var(--primary-dark);
+    transform:translateY(-2px);
+}
+
+@media (max-width:1024px){
+    .search-grid{
+        grid-template-columns:repeat(3,1fr);
+        gap:20px;
+    }
+}
+
+@media (max-width:768px){
+    .search-section{
+        padding:40px 0 56px;
+    }
+
+    .search-container{
+        padding:0 20px;
+    }
+
+    .search-header{
+        margin-bottom:32px;
+    }
+
+    .search-grid{
+        grid-template-columns:repeat(2,1fr);
+        gap:14px;
+    }
+}
+
+@media (max-width:480px){
+    .search-grid{
+        grid-template-columns:repeat(2,1fr);
+        gap:10px;
+    }
+}

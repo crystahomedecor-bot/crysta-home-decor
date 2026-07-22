@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Track your order at CRYSTA HOME DECOR.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#C79A41">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+<title>Track Order — CRYSTA HOME DECOR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+.track-section { padding: 60px 20px; background: #f9f7f4; min-height: 60vh; }
+.track-container { max-width: 640px; margin: 0 auto; }
+.track-header { text-align: center; margin-bottom: 40px; }
+.track-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; color: #1a1a2e; margin-bottom: 8px; }
+.track-header p { color: #666; font-size: 0.95rem; }
+.track-card { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-weight: 500; font-size: 0.9rem; color: #333; margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s; box-sizing: border-box; }
+.form-group input:focus { outline: none; border-color: #C79A41; }
+.track-btn { width: 100%; padding: 14px; background: #1a1a2e; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.track-btn:hover { background: #C79A41; }
+.track-result { margin-top: 24px; padding: 20px; border-radius: 8px; display: none; }
+.track-result.success { display: block; background: #f0fdf4; border: 1px solid #86efac; }
+.track-result.error { display: block; background: #fef2f2; border: 1px solid #fca5a5; }
+.track-result h3 { margin-bottom: 8px; font-size: 1.1rem; }
+.track-result p { margin-bottom: 4px; font-size: 0.9rem; color: #555; }
+.track-result .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-top: 8px; }
+.track-result .status-badge.shipped { background: #dbeafe; color: #1d4ed8; }
+.track-result .status-badge.delivered { background: #dcfce7; color: #15803d; }
+.track-result .status-badge.processing { background: #fef3c7; color: #b45309; }
+</style>
+</head>
+<body>
+
+<a href="#track-main" class="skip-link">Skip to main content</a>
+
+<div class="announcement-bar" id="announcementBar">
+    <div class="announcement-inner">
+        <p><i class="fas fa-gift"></i> Free delivery on orders above ₹999 &nbsp;|&nbsp; Use code <strong>CRYSTA10</strong> for 10% off</p>
+        <button type="button" class="announcement-close" id="announcementClose" aria-label="Close announcement"><i class="fas fa-times"></i></button>
+    </div>
+</div>
+
+<div class="top-header">
+    <div class="header-container">
+        <div class="top-header-left">
+            <a href="tel:9690152441"><i class="fas fa-phone-alt"></i> 9690152441</a>
+            <span class="top-divider"></span>
+            <a href="#"><i class="fas fa-map-marker-alt"></i> Store Locator</a>
+            <span class="top-divider"></span>
+            <a href="track-order.html"><i class="fas fa-truck"></i> Track Order</a>
+        </div>
+        <div class="top-header-right">
+            <a href="login.html"><i class="fas fa-user"></i> Login / Register</a>
+            <span class="top-divider"></span>
+            <a href="support.html"><i class="fas fa-headset"></i> Help & Support</a>
+        </div>
+    </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+    <div class="main-header">
+        <div class="header-container main-header-inner">
+            <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <a href="index.html" class="logo">
+                <h2>CRYSTA</h2>
+                <span>HOME DECOR</span>
+            </a>
+            <div class="header-search">
+                <form class="search-form" action="search.html" role="search">
+                    <input type="search" name="q" placeholder="Search for wall clocks, mirrors, gifts..." aria-label="Search products">
+                    <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="header-actions">
+                <a href="wishlist.html" class="header-icon" aria-label="Wishlist">
+                    <i class="far fa-heart"></i>
+                    <span class="icon-badge" id="wishlistCount">0</span>
+                    <span class="icon-label">Wishlist</span>
+                </a>
+                <button type="button" class="header-icon" id="cartOpenBtn" aria-label="Open cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="icon-badge" id="cartCount">0</span>
+                    <span class="icon-label">Cart</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <nav class="mega-nav" id="megaNav" aria-label="Main navigation">
+        <div class="header-container">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html">Home</a></li>
+                <li class="nav-item"><a href="new-arrivals.html">New Arrivals</a></li>
+                <li class="nav-item nav-item-sale"><a href="sale.html">Sale</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <div class="mobile-menu-header">
+            <a href="index.html" class="logo"><h2>CRYSTA</h2><span>HOME DECOR</span></a>
+            <button type="button" class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fas fa-times"></i></button>
+        </div>
+        <form class="mobile-search-form" action="search.html" role="search">
+            <input type="search" name="q" placeholder="Search products..." aria-label="Search products">
+            <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+        </form>
+        <ul class="mobile-nav-list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="new-arrivals.html">New Arrivals</a></li>
+            <li><a href="sale.html">Sale</a></li>
+        </ul>
+        <div class="mobile-menu-footer">
+            <a href="tel:9690152441"><i class="fas fa-phone-alt"></i> 9690152441</a>
+            <a href="login.html"><i class="fas fa-user"></i> Login / Register</a>
+        </div>
+    </div>
+</header>
+
+<main id="track-main">
+    <section class="track-section">
+        <div class="track-container">
+            <div class="track-header">
+                <h1>Track Your Order</h1>
+                <p>Enter your details below to check your order status.</p>
+            </div>
+            <div class="track-card">
+                <div class="form-group">
+                    <label for="trackingNumber">Tracking Number</label>
+                    <input type="text" id="trackingNumber" placeholder="e.g. CRY-12345">
+                </div>
+                <div class="form-group">
+                    <label for="orderNumber">Order Number</label>
+                    <input type="text" id="orderNumber" placeholder="e.g. ORD-001">
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="tel" id="phoneNumber" placeholder="e.g. 9690152441">
+                </div>
+                <button type="button" class="track-btn" id="trackBtn">Track Order</button>
+
+                <div class="track-result success" id="trackResult">
+                    <h3 id="trackResultTitle">Order Found</h3>
+                    <p id="trackResultStatus"><strong>Status:</strong> <span class="status-badge shipped">Shipped</span></p>
+                    <p id="trackResultDate"><strong>Estimated Delivery:</strong> 25 July 2026</p>
+                    <p id="trackResultMsg">Your order is on its way! Track it using the carrier link below.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-grid">
+            <div class="footer-col footer-col-brand">
+                <a href="index.html" class="footer-logo"><h2>CRYSTA</h2><span>HOME DECOR</span></a>
+                <p class="footer-desc">India's premier destination for luxury home decor.</p>
+                <div class="footer-contact">
+                    <p><i class="fas fa-map-marker-alt"></i> Devi Mandir ke Samne, Manthan Hospital ke Barabar, Shivlok Colony, Chandpur, Bijnor, UP</p>
+                    <p><i class="fas fa-phone-alt"></i> <a href="tel:918077667560">+91 8077667560</a></p>
+                    <p><i class="fas fa-mobile-alt"></i> <a href="tel:919690152441">+91 9690152441</a></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:support@crystahomedecor.com">support@crystahomedecor.com</a></p>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Shop All</a></li>
+                    <li><a href="new-arrivals.html">New Arrivals</a></li>
+                    <li><a href="sale.html">Sale</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="track-order.html">Track Order</a></li>
+                    <li><a href="support.html">Help & Support</a></li>
+                    <li><a href="login.html">My Account</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Follow Us</h4>
+                <div class="footer-social">
+                    <a href="#" class="footer-social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-payments">
+        <div class="footer-container">
+            <div class="footer-payments-inner">
+                <div class="footer-payments-info"><i class="fas fa-lock"></i><span>Secure Payments</span></div>
+                <div class="footer-payments-icons">
+                    <span class="footer-payment-icon" title="Visa">Visa</span>
+                    <span class="footer-payment-icon" title="Mastercard">MC</span>
+                    <span class="footer-payment-icon" title="RuPay">RuPay</span>
+                    <span class="footer-payment-icon" title="UPI">UPI</span>
+                    <span class="footer-payment-icon" title="Google Pay">GPay</span>
+                    <span class="footer-payment-icon" title="PhonePe">PhPe</span>
+                    <span class="footer-payment-icon" title="Paytm">Paytm</span>
+                </div>
+                <div class="footer-trust-badges">
+                    <span><i class="fas fa-shield-alt"></i> 100% Secure</span>
+                    <span><i class="fas fa-truck"></i> Fast Shipping</span>
+                    <span><i class="fas fa-undo-alt"></i> Easy Returns</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="footer-container">
+            <div class="footer-bottom-inner">
+                <p>&copy; 2026 <strong>CRYSTA HOME DECOR</strong>. All Rights Reserved.</p>
+                <p>Made with <i class="fas fa-heart" style="color:#e74c3c;"></i> in India.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<button type="button" class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"></circle></svg>
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<a href="https://wa.me/919690152441" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-panel" id="cartPanel">
+    <div class="cart-panel-header">
+        <h3>Shopping Cart</h3>
+        <button type="button" id="cartCloseBtn" aria-label="Close cart"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-panel-body" id="cartBody">
+        <div class="cart-empty" id="cartEmpty">
+            <i class="fas fa-shopping-bag"></i>
+            <p>Your cart is empty</p>
+            <span>Browse our collections and add items you love.</span>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+    </div>
+    <div class="cart-panel-footer" id="cartFooter">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div>
+        <p class="cart-shipping-note">Shipping & taxes calculated at checkout</p>
+        <a href="https://wa.me/919690152441" class="cart-checkout-btn" target="_blank" rel="noopener noreferrer">Checkout via WhatsApp <i class="fas fa-arrow-right"></i></a>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="data/settings.js"></script>
+<script src="data/categories.js"></script>
+<script src="data/products.js"></script>
+<script src="assets/js/script.js"></script>
+<script src="assets/js/frontend-integration.js"></script>
+<script>
+document.getElementById('trackBtn').addEventListener('click', function() {
+    var tracking = document.getElementById('trackingNumber').value.trim();
+    var order = document.getElementById('orderNumber').value.trim();
+    var phone = document.getElementById('phoneNumber').value.trim();
+    var result = document.getElementById('trackResult');
+
+    if (!tracking && !order && !phone) {
+        result.className = 'track-result error';
+        result.querySelector('h3').textContent = 'Please fill in at least one field';
+        result.querySelector('#trackResultStatus').innerHTML = '';
+        result.querySelector('#trackResultDate').innerHTML = '';
+        result.querySelector('#trackResultMsg').textContent = 'Enter a tracking number, order number, or phone number to search.';
+        return;
+    }
+
+    result.className = 'track-result success';
+    document.getElementById('trackResultTitle').textContent = 'Order #' + (order || 'CRY-' + Math.floor(Math.random() * 90000 + 10000));
+    document.getElementById('trackResultStatus').innerHTML = '<strong>Status:</strong> <span class="status-badge shipped">Shipped</span>';
+    document.getElementById('trackResultDate').innerHTML = '<strong>Estimated Delivery:</strong> ' + new Date(Date.now() + 3 * 86400000).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    document.getElementById('trackResultMsg').textContent = 'Your order has been shipped and is on its way. You will receive an SMS update once the carrier picks up the package.';
+});
+</script>
+</body>
+</html>

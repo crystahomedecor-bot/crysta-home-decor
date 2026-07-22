@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Login or create an account at CRYSTA HOME DECOR.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#C79A41">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+<title>Login / Register — CRYSTA HOME DECOR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+.auth-section { padding: 60px 20px; background: #f9f7f4; min-height: 60vh; display: flex; align-items: center; justify-content: center; }
+.auth-container { max-width: 480px; width: 100%; }
+.auth-card { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.auth-tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 28px; }
+.auth-tab { flex: 1; padding: 12px; text-align: center; font-weight: 600; font-size: 0.95rem; cursor: pointer; color: #999; transition: color 0.2s, border-color 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; }
+.auth-tab.active { color: #C79A41; border-bottom-color: #C79A41; }
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-weight: 500; font-size: 0.9rem; color: #333; margin-bottom: 6px; }
+.form-group input { width: 100%; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s; box-sizing: border-box; }
+.form-group input:focus { outline: none; border-color: #C79A41; }
+.auth-btn { width: 100%; padding: 14px; background: #1a1a2e; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.auth-btn:hover { background: #C79A41; }
+.auth-link { text-align: center; margin-top: 16px; font-size: 0.9rem; }
+.auth-link a { color: #C79A41; text-decoration: none; font-weight: 500; cursor: pointer; background: none; border: none; font-size: 0.9rem; }
+.auth-link a:hover { text-decoration: underline; }
+.auth-divider { text-align: center; margin: 20px 0; color: #aaa; font-size: 0.85rem; }
+.forgot-section { display: none; }
+.forgot-section.active { display: block; }
+.auth-success { display: none; text-align: center; padding: 40px 0; }
+.auth-success.active { display: block; }
+.auth-success i { font-size: 3rem; color: #22c55e; margin-bottom: 16px; }
+.auth-success h3 { margin-bottom: 8px; }
+.auth-success p { color: #666; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<a href="#auth-main" class="skip-link">Skip to main content</a>
+
+<div class="announcement-bar" id="announcementBar">
+    <div class="announcement-inner">
+        <p><i class="fas fa-gift"></i> Free delivery on orders above ₹999 &nbsp;|&nbsp; Use code <strong>CRYSTA10</strong> for 10% off</p>
+        <button type="button" class="announcement-close" id="announcementClose" aria-label="Close announcement"><i class="fas fa-times"></i></button>
+    </div>
+</div>
+
+<div class="top-header">
+    <div class="header-container">
+        <div class="top-header-left">
+            <a href="tel:9690152441"><i class="fas fa-phone-alt"></i> 9690152441</a>
+            <span class="top-divider"></span>
+            <a href="#"><i class="fas fa-map-marker-alt"></i> Store Locator</a>
+            <span class="top-divider"></span>
+            <a href="track-order.html"><i class="fas fa-truck"></i> Track Order</a>
+        </div>
+        <div class="top-header-right">
+            <a href="login.html"><i class="fas fa-user"></i> Login / Register</a>
+            <span class="top-divider"></span>
+            <a href="support.html"><i class="fas fa-headset"></i> Help & Support</a>
+        </div>
+    </div>
+</div>
+
+<header class="site-header" id="siteHeader">
+    <div class="main-header">
+        <div class="header-container main-header-inner">
+            <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <a href="index.html" class="logo">
+                <h2>CRYSTA</h2>
+                <span>HOME DECOR</span>
+            </a>
+            <div class="header-search">
+                <form class="search-form" action="search.html" role="search">
+                    <input type="search" name="q" placeholder="Search for wall clocks, mirrors, gifts..." aria-label="Search products">
+                    <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="header-actions">
+                <a href="wishlist.html" class="header-icon" aria-label="Wishlist">
+                    <i class="far fa-heart"></i>
+                    <span class="icon-badge" id="wishlistCount">0</span>
+                    <span class="icon-label">Wishlist</span>
+                </a>
+                <button type="button" class="header-icon" id="cartOpenBtn" aria-label="Open cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="icon-badge" id="cartCount">0</span>
+                    <span class="icon-label">Cart</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <nav class="mega-nav" id="megaNav" aria-label="Main navigation">
+        <div class="header-container">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="index.html">Home</a></li>
+                <li class="nav-item"><a href="new-arrivals.html">New Arrivals</a></li>
+                <li class="nav-item nav-item-sale"><a href="sale.html">Sale</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <div class="mobile-menu-header">
+            <a href="index.html" class="logo"><h2>CRYSTA</h2><span>HOME DECOR</span></a>
+            <button type="button" class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu"><i class="fas fa-times"></i></button>
+        </div>
+        <form class="mobile-search-form" action="search.html" role="search">
+            <input type="search" name="q" placeholder="Search products..." aria-label="Search products">
+            <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
+        </form>
+        <ul class="mobile-nav-list">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="new-arrivals.html">New Arrivals</a></li>
+            <li><a href="sale.html">Sale</a></li>
+        </ul>
+        <div class="mobile-menu-footer">
+            <a href="tel:9690152441"><i class="fas fa-phone-alt"></i> 9690152441</a>
+            <a href="login.html"><i class="fas fa-user"></i> Login / Register</a>
+        </div>
+    </div>
+</header>
+
+<main id="auth-main">
+    <section class="auth-section">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-tabs">
+                    <button type="button" class="auth-tab active" data-tab="login">Login</button>
+                    <button type="button" class="auth-tab" data-tab="register">Register</button>
+                </div>
+
+                <div class="auth-form active" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                    <button type="button" class="auth-btn" id="loginBtn">Login</button>
+                    <div class="auth-link">
+                        <a id="forgotLink">Forgot Password?</a>
+                    </div>
+                </div>
+
+                <div class="auth-form" id="registerForm">
+                    <div class="form-group">
+                        <label for="regName">Full Name</label>
+                        <input type="text" id="regName" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email Address</label>
+                        <input type="email" id="regEmail" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPhone">Phone Number</label>
+                        <input type="tel" id="regPhone" placeholder="9690152441">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" placeholder="Create a password">
+                    </div>
+                    <button type="button" class="auth-btn" id="registerBtn">Create Account</button>
+                </div>
+
+                <div class="forgot-section" id="forgotSection">
+                    <h3 style="margin-bottom:16px; font-family:'Cormorant Garamond',serif; font-size:1.5rem;">Reset Password</h3>
+                    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">Enter your email and we'll send you a reset link.</p>
+                    <div class="form-group">
+                        <label for="resetEmail">Email Address</label>
+                        <input type="email" id="resetEmail" placeholder="you@example.com">
+                    </div>
+                    <button type="button" class="auth-btn" id="resetBtn">Send Reset Link</button>
+                    <div class="auth-link">
+                        <a id="backToLoginLink">Back to Login</a>
+                    </div>
+                </div>
+
+                <div class="auth-success" id="authSuccess">
+                    <i class="fas fa-check-circle"></i>
+                    <h3 id="successTitle">Success!</h3>
+                    <p id="successMsg">Your request has been processed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-grid">
+            <div class="footer-col footer-col-brand">
+                <a href="index.html" class="footer-logo"><h2>CRYSTA</h2><span>HOME DECOR</span></a>
+                <p class="footer-desc">India's premier destination for luxury home decor.</p>
+                <div class="footer-contact">
+                    <p><i class="fas fa-map-marker-alt"></i> Devi Mandir ke Samne, Manthan Hospital ke Barabar, Shivlok Colony, Chandpur, Bijnor, UP</p>
+                    <p><i class="fas fa-phone-alt"></i> <a href="tel:918077667560">+91 8077667560</a></p>
+                    <p><i class="fas fa-mobile-alt"></i> <a href="tel:919690152441">+91 9690152441</a></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:support@crystahomedecor.com">support@crystahomedecor.com</a></p>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="shop.html">Shop All</a></li>
+                    <li><a href="new-arrivals.html">New Arrivals</a></li>
+                    <li><a href="sale.html">Sale</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="track-order.html">Track Order</a></li>
+                    <li><a href="support.html">Help & Support</a></li>
+                    <li><a href="login.html">My Account</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col-title">Follow Us</h4>
+                <div class="footer-social">
+                    <a href="#" class="footer-social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="footer-social-icon" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-payments">
+        <div class="footer-container">
+            <div class="footer-payments-inner">
+                <div class="footer-payments-info"><i class="fas fa-lock"></i><span>Secure Payments</span></div>
+                <div class="footer-payments-icons">
+                    <span class="footer-payment-icon" title="Visa">Visa</span>
+                    <span class="footer-payment-icon" title="Mastercard">MC</span>
+                    <span class="footer-payment-icon" title="RuPay">RuPay</span>
+                    <span class="footer-payment-icon" title="UPI">UPI</span>
+                    <span class="footer-payment-icon" title="Google Pay">GPay</span>
+                    <span class="footer-payment-icon" title="PhonePe">PhPe</span>
+                    <span class="footer-payment-icon" title="Paytm">Paytm</span>
+                </div>
+                <div class="footer-trust-badges">
+                    <span><i class="fas fa-shield-alt"></i> 100% Secure</span>
+                    <span><i class="fas fa-truck"></i> Fast Shipping</span>
+                    <span><i class="fas fa-undo-alt"></i> Easy Returns</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="footer-container">
+            <div class="footer-bottom-inner">
+                <p>&copy; 2026 <strong>CRYSTA HOME DECOR</strong>. All Rights Reserved.</p>
+                <p>Made with <i class="fas fa-heart" style="color:#e74c3c;"></i> in India.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<button type="button" class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21"></circle></svg>
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<a href="https://wa.me/919690152441" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-panel" id="cartPanel">
+    <div class="cart-panel-header">
+        <h3>Shopping Cart</h3>
+        <button type="button" id="cartCloseBtn" aria-label="Close cart"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-panel-body" id="cartBody">
+        <div class="cart-empty" id="cartEmpty">
+            <i class="fas fa-shopping-bag"></i>
+            <p>Your cart is empty</p>
+            <span>Browse our collections and add items you love.</span>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+    </div>
+    <div class="cart-panel-footer" id="cartFooter">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">₹0</span></div>
+        <p class="cart-shipping-note">Shipping & taxes calculated at checkout</p>
+        <a href="https://wa.me/919690152441" class="cart-checkout-btn" target="_blank" rel="noopener noreferrer">Checkout via WhatsApp <i class="fas fa-arrow-right"></i></a>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<script src="data/settings.js"></script>
+<script src="data/categories.js"></script>
+<script src="data/products.js"></script>
+<script src="assets/js/script.js"></script>
+<script src="assets/js/frontend-integration.js"></script>
+<script>
+(function() {
+    var tabs = document.querySelectorAll('.auth-tab');
+    var loginForm = document.getElementById('loginForm');
+    var registerForm = document.getElementById('registerForm');
+    var forgotSection = document.getElementById('forgotSection');
+    var authSuccess = document.getElementById('authSuccess');
+    var activeTab = 'login';
+
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            tabs.forEach(function(t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            activeTab = tab.dataset.tab;
+            loginForm.classList.toggle('active', activeTab === 'login');
+            registerForm.classList.toggle('active', activeTab === 'register');
+            forgotSection.classList.remove('active');
+            authSuccess.classList.remove('active');
+        });
+    });
+
+    document.getElementById('forgotLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        loginForm.classList.remove('active');
+        registerForm.classList.remove('active');
+        forgotSection.classList.add('active');
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+    });
+
+    document.getElementById('backToLoginLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        forgotSection.classList.remove('active');
+        loginForm.classList.add('active');
+        tabs[0].classList.add('active');
+        tabs[1].classList.remove('active');
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', function() {
+        var email = document.getElementById('loginEmail').value.trim();
+        if (!email) { alert('Please enter your email.'); return; }
+        showSuccess('Welcome Back!', 'You have been logged in successfully. (Demo — no backend connected yet.)');
+    });
+
+    document.getElementById('registerBtn').addEventListener('click', function() {
+        var name = document.getElementById('regName').value.trim();
+        var email = document.getElementById('regEmail').value.trim();
+        if (!name || !email) { alert('Please fill in your name and email.'); return; }
+        showSuccess('Account Created!', 'Your account has been created successfully. (Demo — no backend connected yet.)');
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function() {
+        var email = document.getElementById('resetEmail').value.trim();
+        if (!email) { alert('Please enter your email.'); return; }
+        showSuccess('Reset Link Sent!', 'If an account exists with this email, you will receive a password reset link shortly.');
+    });
+
+    function showSuccess(title, msg) {
+        loginForm.classList.remove('active');
+        registerForm.classList.remove('active');
+        forgotSection.classList.remove('active');
+        authSuccess.classList.add('active');
+        document.getElementById('successTitle').textContent = title;
+        document.getElementById('successMsg').textContent = msg;
+    }
+})();
+</script>
+</body>
+</html>

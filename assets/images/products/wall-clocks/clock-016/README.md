@@ -1,0 +1,10 @@
+﻿Product Folder
+Place images here.
+
+Recommended naming:
+
+1.webp
+2.webp
+3.webp
+4.webp
+5.webp
