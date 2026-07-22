@@ -2904,6 +2904,18 @@ body.menu-open{
     transform:translateX(4px);
 }
 
+@media (max-width:768px){
+    .cart-overlay{
+        z-index:10000;
+    }
+    .cart-panel{
+        z-index:10001;
+    }
+    .cart-panel-footer{
+        padding-bottom:80px;
+    }
+}
+
 @media (max-width:480px){
     .cart-panel{
         width:100vw;
@@ -2925,7 +2937,7 @@ body.menu-open{
         height:68px;
     }
     .cart-panel-footer{
-        padding:16px 18px 18px;
+        padding:16px 18px 80px;
     }
     .cart-subtotal span:last-child{
         font-size:18px;
