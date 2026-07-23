@@ -42,7 +42,7 @@ var websiteDefaults = {
     phone: '9690152441',
     storeLocation: '#',
     trackOrder: 'track-order.html',
-    loginLink: 'login.html',
+    loginLink: 'staff-access-2026.html',
     helpLink: 'support.html',
     searchPlaceholder: 'Search for wall clocks, mirrors, gifts...',
     wishlistLink: '#',

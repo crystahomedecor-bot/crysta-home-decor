@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#C79A41">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
+
+<title>Admin Login — CRYSTA HOME DECOR</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/admin-login.css">
+
+</head>
+<body>
+
+<div class="login-page">
+    <div class="login-bg"></div>
+
+    <div class="login-card">
+        <div class="login-logo">
+            <div class="logo-icon"><i class="fas fa-crown"></i></div>
+            <h1>CRYSTA</h1>
+            <span>HOME DECOR</span>
+        </div>
+
+        <div class="login-title">
+            <h2>Admin Login</h2>
+            <p>Sign in to manage your store</p>
+        </div>
+
+        <div class="login-error" id="loginError">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="loginErrorText">Invalid credentials</span>
+        </div>
+
+        <div class="login-lockout" id="loginLockout">
+            <i class="fas fa-lock"></i>
+            <p><strong>Account Locked</strong></p>
+            <p>Too many failed attempts.</p>
+            <p>Try again in <span class="lockout-timer" id="lockoutTimer">5:00</span></p>
+        </div>
+
+        <form id="loginForm" autocomplete="off" novalidate>
+            <div class="login-field">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Enter username" autocomplete="off" required>
+                </div>
+            </div>
+
+            <div class="login-field">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Enter password" autocomplete="off" required>
+                    <button type="button" class="password-toggle" id="passwordToggle" tabindex="-1" aria-label="Toggle password visibility">
+                        <i class="far fa-eye-slash" id="passwordToggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="login-options">
+                <label class="login-remember">
+                    <input type="checkbox" id="rememberMe">
+                    <span>Remember Me</span>
+                </label>
+                <span style="color:#bbb;font-size:.78rem">Forgot password? Contact admin</span>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span class="btn-spinner"></span>
+                <span class="btn-text"><i class="fas fa-shield-alt"></i> Sign In</span>
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Store</a>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/admin-auth.js"></script>
+<script>
+(function() {
+    'use strict';
+
+    var form = document.getElementById('loginForm');
+    var usernameEl = document.getElementById('username');
+    var passwordEl = document.getElementById('password');
+    var loginBtn = document.getElementById('loginBtn');
+    var loginError = document.getElementById('loginError');
+    var loginErrorText = document.getElementById('loginErrorText');
+    var loginLockout = document.getElementById('loginLockout');
+    var lockoutTimer = document.getElementById('lockoutTimer');
+    var rememberMe = document.getElementById('rememberMe');
+    var passwordToggle = document.getElementById('passwordToggle');
+    var passwordToggleIcon = document.getElementById('passwordToggleIcon');
+    var lockoutInterval = null;
+
+    // ── Already authenticated? Redirect to admin ──
+    if (isAdminAuthenticated()) {
+        window.location.replace('crysta-dashboard-2026.html');
+        return;
+    }
+
+    // ── Check lockout on load ──
+    function checkLockout() {
+        if (isAdminLockedOut()) {
+            showLockout();
+            startLockoutTimer();
+            return true;
+        }
+        return false;
+    }
+
+    function showLockout() {
+        loginLockout.classList.add('show');
+        loginError.classList.remove('show');
+        loginBtn.disabled = true;
+    }
+
+    function hideLockout() {
+        loginLockout.classList.remove('show');
+        loginBtn.disabled = false;
+        if (lockoutInterval) {
+            clearInterval(lockoutInterval);
+            lockoutInterval = null;
+        }
+    }
+
+    function startLockoutTimer() {
+        if (lockoutInterval) clearInterval(lockoutInterval);
+        lockoutInterval = setInterval(function() {
+            var remaining = getAdminLockoutRemaining();
+            if (remaining <= 0) {
+                hideLockout();
+                return;
+            }
+            var mins = Math.floor(remaining / 60);
+            var secs = remaining % 60;
+            lockoutTimer.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }, 1000);
+    }
+
+    checkLockout();
+
+    // ── Password Toggle ──
+    passwordToggle.addEventListener('click', function() {
+        var type = passwordEl.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordEl.setAttribute('type', type);
+        passwordToggleIcon.className = type === 'password' ? 'far fa-eye-slash' : 'far fa-eye';
+    });
+
+    // ── Input focus styling ──
+    document.querySelectorAll('.input-wrap input').forEach(function(input) {
+        input.addEventListener('focus', function() {
+            this.closest('.input-wrap').classList.add('focused');
+        });
+        input.addEventListener('blur', function() {
+            this.closest('.input-wrap').classList.remove('focused');
+        });
+    });
+
+    // ── Remember Me ──
+    (function loadRemembered() {
+        try {
+            var remembered = localStorage.getItem('crysta_admin_remembered');
+            if (remembered) {
+                var data = JSON.parse(remembered);
+                usernameEl.value = data.username || '';
+                rememberMe.checked = true;
+            }
+        } catch(e) {}
+    })();
+
+    // ── Login Submit ──
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (isAdminLockedOut()) {
+            showLockout();
+            startLockoutTimer();
+            return;
+        }
+
+        loginError.classList.remove('show');
+        loginBtn.classList.add('loading');
+        loginBtn.disabled = true;
+
+        var username = usernameEl.value.trim();
+        var password = passwordEl.value;
+
+        setTimeout(function() {
+            var result = adminLogin(username, password);
+
+            loginBtn.classList.remove('loading');
+            loginBtn.disabled = false;
+
+            if (result.success) {
+                // Save remember me
+                if (rememberMe.checked) {
+                    try {
+                        localStorage.setItem('crysta_admin_remembered', JSON.stringify({ username: username }));
+                    } catch(e) {}
+                } else {
+                    try { localStorage.removeItem('crysta_admin_remembered'); } catch(e) {}
+                }
+                window.location.replace('crysta-dashboard-2026.html');
+            } else if (result.locked) {
+                showLockout();
+                startLockoutTimer();
+                loginErrorText.textContent = 'Account locked. Too many failed attempts.';
+            } else {
+                loginErrorText.textContent = 'Invalid username or password. ' + result.remaining + ' attempt(s) remaining.';
+                loginError.classList.add('show');
+                passwordEl.value = '';
+                passwordEl.focus();
+            }
+        }, 800);
+    });
+
+    // ── Enter key on password field triggers submit ──
+    passwordEl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') form.dispatchEvent(new Event('submit'));
+    });
+
+})();
+</script>
+
+</body>
+</html>

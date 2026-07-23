@@ -52,7 +52,7 @@
             } else if (t.indexOf('Track Order') !== -1) {
                 a.href = 'track-order.html';
             } else if (t.indexOf('Login') !== -1 || t.indexOf('Register') !== -1) {
-                a.href = 'login.html';
+                a.href = 'staff-access-2026.html';
             } else if (t.indexOf('Help') !== -1 || t.indexOf('Support') !== -1) {
                 a.href = 'support.html';
             }
@@ -62,7 +62,7 @@
         mobLinks.forEach(function(a) {
             var t = a.textContent.trim();
             if (t.indexOf('Login') !== -1 || t.indexOf('Register') !== -1) {
-                a.href = 'login.html';
+                a.href = 'staff-access-2026.html';
             }
         });
     }

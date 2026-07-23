@@ -873,7 +873,7 @@ server.listen(PORT, function() {
     console.log('  \u2551   CRYSTA HOME DECOR \u2014 Admin Server   \u2551');
     console.log('  \u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d');
     console.log('');
-    console.log('  Admin Panel:  http://localhost:' + PORT + '/admin.html');
+    console.log('  Admin Panel:  http://localhost:' + PORT + '/crysta-dashboard-2026.html');
     console.log('  Health Check: http://localhost:' + PORT + '/api/health');
     console.log('');
     console.log('  Press Ctrl+C to stop.');

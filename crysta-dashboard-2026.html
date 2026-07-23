@@ -6,9 +6,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#C79A41">
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
 
 <title>Admin — CRYSTA HOME DECOR</title>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     AUTH CHECK — runs before any content renders (blocking)
+     ═══════════════════════════════════════════════════════════════ -->
+<script src="assets/js/admin-auth.js"></script>
+<script>
+(function(){
+    if (!isAdminAuthenticated()) {
+        window.location.replace('staff-access-2026.html');
+    }
+})();
+</script>
+<!-- ─── End Auth Check ─── -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,6 +63,9 @@
 .admin-sidebar.expanded .sidebar-nav-item span{opacity:1}
 .admin-sidebar .sidebar-footer{padding:12px;overflow:hidden;white-space:nowrap;border-top:1px solid rgba(255,255,255,.08);font-size:.7rem;color:rgba(255,255,255,.3);text-align:center;opacity:0;transition:opacity .2s ease .1s}
 .admin-sidebar.expanded .sidebar-footer{opacity:1}
+.admin-sidebar .logout-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:rgba(255,255,255,.5);font-size:.75rem;font-weight:500;cursor:pointer;transition:all .2s;width:100%;text-align:left;font-family:var(--font-body);white-space:nowrap}
+.admin-sidebar .logout-btn:hover{background:rgba(231,76,60,.15);border-color:rgba(231,76,60,.3);color:#e74c3c}
+.admin-sidebar .logout-btn i{font-size:.85rem}
 .admin-sidebar .sidebar-overlay{display:none}
 
 /* ── Admin Main Content ── */
@@ -518,7 +537,7 @@
             <ul class="nav-list">
                 <li class="nav-item"><a href="index.html">Home</a></li>
                 <li class="nav-item"><a href="shop.html">Shop</a></li>
-                <li class="nav-item"><a href="admin.html" class="active">Admin</a></li>
+                <li class="nav-item"><a href="crysta-dashboard-2026.html" class="active">Admin</a></li>
             </ul>
         </div>
     </nav>
@@ -548,7 +567,10 @@
         <button type="button" class="sidebar-nav-item" data-section="settings"><i class="fas fa-cog"></i> <span>Settings</span></button>
         <button type="button" class="sidebar-nav-item" data-section="analytics"><i class="fas fa-chart-line"></i> <span>Analytics</span></button>
     </nav>
-    <div class="sidebar-footer">v1.0 &copy; CRYSTA HOME DECOR</div>
+    <div class="sidebar-footer">
+        <button type="button" class="logout-btn" id="logoutBtn" title="Logout"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+        <div style="margin-top:6px;font-size:.65rem;opacity:.6">v1.0 &copy; CRYSTA HOME DECOR</div>
+    </div>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 </aside>
 
@@ -1057,7 +1079,7 @@
                     <div class="fg"><label>Phone Number</label><input class="fc website-field" data-ws="phone" placeholder="9690152441"></div>
                     <div class="fg"><label>Store Location Link</label><input class="fc website-field" data-ws="storeLocation" placeholder="#"></div>
                     <div class="fg"><label>Track Order Link</label><input class="fc website-field" data-ws="trackOrder" placeholder="track-order.html"></div>
-                    <div class="fg"><label>Login/Register Link</label><input class="fc website-field" data-ws="loginLink" placeholder="login.html"></div>
+                    <div class="fg"><label>Login/Register Link</label><input class="fc website-field" data-ws="loginLink" placeholder="staff-access-2026.html"></div>
                     <div class="fg"><label>Help &amp; Support Link</label><input class="fc website-field" data-ws="helpLink" placeholder="support.html"></div>
                     <div class="fg"><label>Search Placeholder</label><input class="fc website-field" data-ws="searchPlaceholder" placeholder="Search for wall clocks, mirrors, gifts..."></div>
                     <div class="fg"><label>Wishlist Link</label><input class="fc website-field" data-ws="wishlistLink" placeholder="#"></div>
@@ -3072,6 +3094,7 @@ function bindEvents() {
 //  BOOT
 // ═══════════════════════════════════════════════
 
+adminInitIdleTimer();
 init();
 
 // ── Sidebar Toggle ──
@@ -3092,6 +3115,12 @@ init();
     // Close on Escape
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isMobile())sidebar.classList.remove('expanded')});
 })();
+
+// ── Logout ──
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    adminLogout();
+    window.location.replace('staff-access-2026.html');
+});
 
 })();
 </script>
