@@ -104,7 +104,7 @@ const PRODUCTS = [
         subcategory: '',
         price: 999,
         oldPrice: 0,
-        stock: 8,
+        stock: 0,
         images: [
             'assets/images/products/wall-clocks/clock-006/New wall clock 1 (1).jpg',
             'assets/images/products/wall-clocks/clock-006/New wall clock 1 (2).jpg',

@@ -721,18 +721,28 @@ body.menu-open{
     }
 
     .main-header-inner{
-        grid-template-columns:auto 1fr auto;
-        gap:16px;
-    }
-
-    .header-search{
-        display:none;
+        display:flex;
+        flex-wrap:wrap;
+        align-items:center;
+        gap:8px 16px;
     }
 
     .mobile-menu-btn{
         display:flex;
-        order:-1;
     }
+
+    .logo{
+        margin-right:auto;
+    }
+
+   .header-search{
+    display:block;
+    order:1;
+    width:100%;
+    max-width:100%;
+    margin:4px 0 0;
+    flex:0 0 100%;
+}
 
     .logo h2{
         font-size:28px;
@@ -1314,6 +1324,8 @@ body.menu-open{
         transform:translateY(0);
     }
 }
+/* ===========================
+   FEATURES
 =========================== */
 
 .features{
