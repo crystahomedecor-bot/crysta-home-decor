@@ -118,17 +118,19 @@
 
 .login-field .input-wrap{
     position:relative;
-    display:flex;
-    align-items:center;
+    display:block;
 }
 
-.login-field .input-wrap i{
+.login-field .input-wrap > i{
     position:absolute;
     left:14px;
+    top:50%;
+    transform:translateY(-50%);
     color:#bbb;
     font-size:.88rem;
     pointer-events:none;
     transition:color .2s;
+    z-index:1;
 }
 
 .login-field .input-wrap.focused i{
@@ -137,7 +139,7 @@
 
 .login-field .input-wrap input{
     width:100%;
-    padding:13px 14px 13px 42px;
+    padding:13px 44px 13px 42px;
     border:1.5px solid #e8e8e8;
     border-radius:10px;
     font-size:.9rem;
@@ -158,23 +160,55 @@
     color:#bbb;
 }
 
-.login-field .password-toggle{
+/* ── Password Toggle ── */
+.pw-field{
+    position:relative;
+}
+
+.pw-field input{
+    width:100%;
+    padding:13px 44px 13px 14px;
+    border:1.5px solid #e8e8e8;
+    border-radius:10px;
+    font-size:.9rem;
+    font-family:var(--font-body);
+    color:var(--color-dark);
+    background:#fafafa;
+    transition:all .2s;
+    outline:none;
+}
+
+.pw-field input:focus{
+    border-color:var(--color-gold);
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(199,154,65,.08);
+}
+
+.pw-eye{
     position:absolute;
-    right:14px;
+    right:4px;
     top:50%;
     transform:translateY(-50%);
+    width:36px;
+    height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     background:none;
     border:none;
     color:#bbb;
     cursor:pointer;
-    padding:4px;
-    font-size:.88rem;
-    transition:color .15s;
-    z-index:2;
+    font-size:16px;
+    z-index:1;
+    border-radius:8px;
 }
 
-.login-field .password-toggle:hover{
+.pw-eye:hover{
     color:var(--color-gold);
+}
+
+.pw-eye i{
+    line-height:1;
 }
 
 .login-options{
@@ -364,7 +398,11 @@
         font-size:1.15rem;
     }
     .login-field .input-wrap input{
-        padding:12px 14px 12px 40px;
+        padding:12px 44px 12px 40px;
+        font-size:.85rem;
+    }
+    .pw-field input{
+        padding:12px 44px 12px 14px;
         font-size:.85rem;
     }
 }

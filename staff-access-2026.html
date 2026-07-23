@@ -57,10 +57,9 @@
 
             <div class="login-field">
                 <label for="password">Password</label>
-                <div class="input-wrap">
-                    <i class="fas fa-lock"></i>
+                <div class="pw-field">
                     <input type="password" id="password" placeholder="Enter password" autocomplete="off" required>
-                    <button type="button" class="password-toggle" id="passwordToggle" tabindex="-1" aria-label="Toggle password visibility">
+                    <button type="button" class="pw-eye" id="passwordToggle" tabindex="-1" aria-label="Toggle password visibility">
                         <i class="far fa-eye-slash" id="passwordToggleIcon"></i>
                     </button>
                 </div>
@@ -152,10 +151,10 @@
     checkLockout();
 
     // ── Password Toggle ──
-    passwordToggle.addEventListener('click', function() {
-        var type = passwordEl.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordEl.setAttribute('type', type);
-        passwordToggleIcon.className = type === 'password' ? 'far fa-eye-slash' : 'far fa-eye';
+    passwordToggle.addEventListener('click', function(e) {
+        var isPassword = document.getElementById('password').type === 'password';
+        document.getElementById('password').type = isPassword ? 'text' : 'password';
+        document.getElementById('passwordToggleIcon').className = isPassword ? 'far fa-eye' : 'far fa-eye-slash';
     });
 
     // ── Input focus styling ──
