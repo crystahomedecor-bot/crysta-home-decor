@@ -24,7 +24,7 @@
 
             return '<div class="wishlist-item" data-id="' + id + '">' +
                 '<div class="wishlist-item-image">' +
-                    '<a href="product.html?id=' + id + '"><img src="' + (typeof imgUrl !== 'undefined' ? imgUrl(item.image) : item.image) + '" alt="' + name + '" loading="lazy"></a>' +
+                    '<a href="product.html?id=' + id + '"><img src="' + item.image + '" alt="' + name + '" loading="lazy"></a>' +
                 '</div>' +
                 '<div class="wishlist-item-info">' +
                     '<a href="product.html?id=' + id + '" class="wishlist-item-name">' + item.name + '</a>' +
@@ -42,7 +42,7 @@
                 var id = this.closest('.wishlist-item').dataset.id;
                 var item = Wishlist.getItems()[id];
                 if (item && typeof Cart !== 'undefined') {
-                    Cart.add({ id: item.id, name: item.name, price: item.price, image: imgUrl(item.image) });
+                    Cart.add({ id: item.id, name: item.name, price: item.price, image: item.image });
                     this.textContent = 'Added ✓';
                     this.classList.add('added');
                     setTimeout(function () {

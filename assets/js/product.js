@@ -58,7 +58,7 @@
 
     function showImage(index) {
         current = index;
-        mainImg.src = imgUrl(product.images[index]);
+        mainImg.src = product.images[index];
         mainImg.alt = product.name;
         var thumbImgs = thumbs.querySelectorAll('.pd-thumb-img');
         thumbImgs.forEach(function (t, i) {
@@ -70,7 +70,7 @@
         var thumb = document.createElement('button');
         thumb.type = 'button';
         thumb.className = 'pd-thumb-img' + (idx === 0 ? ' active' : '');
-        thumb.style.backgroundImage = "url('" + imgUrl(img) + "')";
+        thumb.style.backgroundImage = "url('" + img + "')";
         thumb.setAttribute('aria-label', 'View image ' + (idx + 1));
         thumb.addEventListener('click', function () { showImage(idx); });
         thumbs.appendChild(thumb);
@@ -125,7 +125,7 @@
             var rpDiscount = Math.round((1 - rp.price / rp.oldPrice) * 100);
             relatedHtml += '<a href="product.html?id=' + rp.id + '" class="pd-related-card">' +
                 '<div class="pd-related-media">' +
-                    '<img src="' + imgUrl(rp.images[0]) + '" alt="' + rp.name + '" loading="lazy">' +
+                    '<img src="' + rp.images[0] + '" alt="' + rp.name + '" loading="lazy">' +
                     (rpDiscount > 0 ? '<span class="pd-related-badge">-' + rpDiscount + '%</span>' : '') +
                 '</div>' +
                 '<div class="pd-related-body">' +
@@ -146,7 +146,7 @@
                 id: product.id,
                 name: product.name,
                 price: product.price,
-                image: imgUrl(product.images[0])
+                image: product.images[0]
             });
             this.textContent = 'Added ✓';
             this.classList.add('added');
@@ -164,7 +164,7 @@
             icon.className = 'far fa-heart';
             if (typeof Toast !== 'undefined') Toast.success('Removed from Wishlist', 'Wishlist');
         } else {
-            Wishlist.add({ id: product.id, name: product.name, price: product.price, image: imgUrl(product.images[0]) });
+            Wishlist.add({ id: product.id, name: product.name, price: product.price, image: product.images[0] });
             icon.className = 'fas fa-heart';
             if (typeof Toast !== 'undefined') Toast.success('Added to Wishlist', 'Wishlist');
         }
