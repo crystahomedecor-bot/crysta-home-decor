@@ -8,7 +8,7 @@
     CATEGORIES.forEach(function (cat) {
         html += '<a href="shop.html?category=' + cat.slug + '" class="category-card">' +
             '<div class="category-image">' +
-                '<img src="' + cat.image + '" alt="' + cat.name + '" loading="lazy" width="400" height="400" onerror="console.warn(\'Category image not found: ' + cat.image + '\')">' +
+                '<img src="' + imgUrl(cat.image) + '" alt="' + cat.name + '" loading="lazy" width="400" height="400" onerror="console.warn(\'Category image not found: ' + imgUrl(cat.image) + '\')">' +
                 '<div class="category-overlay">' +
                     '<span class="category-shop-btn">Shop Now</span>' +
                 '</div>' +

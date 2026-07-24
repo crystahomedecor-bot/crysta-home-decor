@@ -378,7 +378,7 @@ const Cart = {
 
         container.innerHTML = entries.map(item => `
             <div class="cart-item" data-id="${item.id}">
-                <div class="cart-item-image"><img src="${item.image}" alt="${item.name}" loading="lazy"></div>
+                <div class="cart-item-image"><img src="${typeof imgUrl !== 'undefined' ? imgUrl(item.image) : item.image}" alt="${item.name}" loading="lazy"></div>
                 <div class="cart-item-info">
                     <div class="cart-item-name">${item.name}</div>
                     <div class="cart-item-price">₹${item.price.toLocaleString('en-IN')}</div>
@@ -450,7 +450,7 @@ const Wishlist = {
     add(product) {
         var items = this.getItems();
         if (items[product.id]) return false;
-        items[product.id] = { id: product.id, name: product.name, price: product.price, image: product.image };
+        items[product.id] = { id: product.id, name: product.name, price: product.price, image: imgUrl(product.image) };
         this.saveItems(items);
         this.updateBadge();
         return true;
@@ -473,7 +473,7 @@ const Wishlist = {
             this.updateBadge();
             return false;
         }
-        items[product.id] = { id: product.id, name: product.name, price: product.price, image: product.image };
+        items[product.id] = { id: product.id, name: product.name, price: product.price, image: imgUrl(product.image) };
         this.saveItems(items);
         this.updateBadge();
         return true;

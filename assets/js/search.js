@@ -38,7 +38,7 @@
                 '<div class="sp-slider" id="spSlider-' + product.id + '">';
 
         product.images.forEach(function (img, idx) {
-            html += '<img src="' + img + '" alt="' + product.name + '" class="sp-slide' + (idx === 0 ? ' active' : '') + '" loading="lazy">';
+            html += '<img src="' + imgUrl(img) + '" alt="' + product.name + '" class="sp-slide' + (idx === 0 ? ' active' : '') + '" loading="lazy">';
         });
 
         html += '</div>';
@@ -84,7 +84,7 @@
                 icon.className = 'far fa-heart';
                 if (typeof Toast !== 'undefined') Toast.success('Removed from Wishlist', 'Wishlist');
             } else {
-                Wishlist.add({ id: p.id, name: p.name, price: p.price, image: p.images[0] });
+                Wishlist.add({ id: p.id, name: p.name, price: p.price, image: imgUrl(p.images[0]) });
                 icon.className = 'fas fa-heart';
                 if (typeof Toast !== 'undefined') Toast.success('Added to Wishlist', 'Wishlist');
             }

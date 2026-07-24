@@ -1390,7 +1390,9 @@
                 <p style="font-size:.78rem;color:#999;margin:0 0 4px">Drag thumbnails to reorder. Click <strong>Cover</strong> to set the primary image.</p>
                 <div class="gallery-grid" id="galleryGrid"></div>
                 <div class="gallery-upload-area" id="galleryUploadArea">
-                    <p><i class="fas fa-cloud-upload-alt"></i> Add images to <code id="galleryFolderPath">products/&lt;id&gt;/</code> and run <code>npm run scan-products</code></p>
+                    <input type="file" id="galleryFileInput" accept="image/*" multiple style="display:none">
+                    <button type="button" class="btn btn-sm btn-outline" id="galleryUploadBtn"><i class="fas fa-upload"></i> Upload Images</button>
+                    <span id="galleryUploadStatus" style="margin-left:8px;font-size:.8rem;color:#999"></span>
                 </div>
             </div>
         </div>
@@ -2117,6 +2119,7 @@ function openEditor(id) {
     renderEditorSpecs(p.specifications || {});
     renderGallery(p.images || []);
     updateGalleryPath();
+    bindGalleryUploadEvents();
 
     switchEditorTab('general');
     showFooterStatus('unsaved');
@@ -2308,7 +2311,19 @@ function bindGalleryActions() {
 }
 
 function removeGalleryImage(item) {
+    var path = item.dataset.path;
     item.remove();
+
+    // Delete from server (fire-and-forget)
+    if (path && !path.startsWith('data:') && !path.startsWith('blob:')) {
+        var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+        fetch(apiBase + '/api/product-images', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: path })
+        }).catch(function() {});
+    }
+
     // Re-order numbers
     var items = document.getElementById('galleryGrid').querySelectorAll('.gallery-item');
     items.forEach(function(el, i) {
@@ -2422,6 +2437,69 @@ function setupGalleryDragDrop() {
     grid.addEventListener('dragleave', function(e) {
         var item = e.target.closest('.gallery-item');
         if (item && !item.contains(e.relatedTarget)) item.classList.remove('drag-over');
+    });
+}
+
+// ── Editor: Gallery Upload ──
+
+function uploadGalleryImages(files) {
+    var statusEl = document.getElementById('galleryUploadStatus');
+    var id = document.getElementById('eId').value;
+    var category = document.getElementById('eCategory').value;
+    if (!id || !category) { statusEl.textContent = 'Save the product first'; return; }
+    if (!files || files.length === 0) return;
+
+    statusEl.textContent = 'Uploading ' + files.length + ' image(s)...';
+    var url = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/api/product-images';
+
+    var formData = new FormData();
+    formData.append('productId', id);
+    formData.append('category', category);
+    for (var fi = 0; fi < files.length; fi++) {
+        formData.append('images', files[fi]);
+    }
+
+    fetch(url, { method: 'POST', body: formData })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.paths && data.paths.length > 0) {
+                // Add new paths to current product images
+                var images = collectGalleryOrder();
+                for (var pi = 0; pi < data.paths.length; pi++) {
+                    images.push(data.paths[pi]);
+                }
+                renderGallery(images);
+                saveGalleryState();
+                statusEl.textContent = data.paths.length + ' image(s) uploaded';
+                setTimeout(function() { statusEl.textContent = ''; }, 3000);
+            } else {
+                statusEl.textContent = data.message || 'Upload failed';
+            }
+        })
+        .catch(function(err) {
+            statusEl.textContent = 'Upload error: ' + err.message;
+        });
+}
+
+// ── Bind gallery upload events ──
+
+function bindGalleryUploadEvents() {
+    var btn = document.getElementById('galleryUploadBtn');
+    var input = document.getElementById('galleryFileInput');
+    if (!btn || !input) return;
+
+    btn.replaceWith(btn.cloneNode(true));
+    input.replaceWith(input.cloneNode(true));
+
+    btn = document.getElementById('galleryUploadBtn');
+    input = document.getElementById('galleryFileInput');
+
+    btn.addEventListener('click', function() { input.click(); });
+    input.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files.length > 0) {
+            uploadGalleryImages(e.target.files);
+            this.value = '';
+        }
     });
 }
 

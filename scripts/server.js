@@ -190,7 +190,8 @@ function jsonResponse(res, status, data) {
 
 // ── Multipart form-data parser ──
 function parseMultipart(body, boundary) {
-    var parts = body.split('--' + boundary);
+    var delimiter = '--' + boundary;
+    var parts = body.split(delimiter);
     var fields = {};
     var files = [];
 
@@ -198,14 +199,28 @@ function parseMultipart(body, boundary) {
         var part = parts[i];
         if (part.trim() === '' || part.trim() === '--') continue;
 
+        // All parts start with \r\n (the CRLF before the boundary that was not part of the split)
+        // Remove leading \r\n if present
+        if (part.indexOf('\r\n') === 0) part = part.substring(2);
+
         var headerEnd = part.indexOf('\r\n\r\n');
         if (headerEnd === -1) continue;
 
         var headers = part.substring(0, headerEnd);
         var content = part.substring(headerEnd + 4);
 
-        // Remove trailing \r\n before next boundary
-        if (content.endsWith('\r\n')) content = content.slice(0, -2);
+        // Determine the actual content length from the original body position
+        // The content ends at the next delimiter (or at end of string)
+        // Since we split by the delimiter, the trailing CRLF belongs to the next part
+        // We need to check if this is NOT the last part
+        // Intermediate parts have a trailing \r\n which is the separator before the next boundary
+        // The last part is "--\r\n" (terminator, trimmed above)
+        if (i < parts.length - 1) {
+            // This is an intermediate part. The trailing \r\n is the separator.
+            if (content.length >= 2 && content.substring(content.length - 2) === '\r\n') {
+                content = content.substring(0, content.length - 2);
+            }
+        }
 
         var nameMatch = headers.match(/name="([^"]+)"/);
         if (!nameMatch) continue;
@@ -362,16 +377,47 @@ async function handleAPI(req, res) {
         return;
     }
 
+    // ── Debug: check if a file/dir exists ──
+    if (pathname === '/api/debug-image' && req.method === 'GET') {
+        var checkPath = (url.searchParams.get('path') || '').trim();
+        var absPath = path.join(ROOT, decodeURIComponent(checkPath));
+        var exists = fs.existsSync(absPath);
+        var isDir = false;
+        var contents = null;
+        if (exists) {
+            isDir = fs.statSync(absPath).isDirectory();
+            if (isDir) {
+                try { contents = fs.readdirSync(absPath); } catch(e) { contents = null; }
+            }
+        }
+        jsonResponse(res, 200, {
+            path: checkPath,
+            absolute: absPath,
+            exists: exists,
+            isDirectory: isDir,
+            contents: contents
+        });
+        return;
+    }
+
     // POST /api/products — Upload images + create product
     if (pathname === '/api/products' && req.method === 'POST') {
+        var LOG = [];
+        function slog(m) { LOG.push(m); console.log('[UPLOAD] ' + m); }
+
         try {
+            slog('=== /api/products POST started ===');
             var contentType = req.headers['content-type'] || '';
+            slog('Content-Type: ' + contentType.substring(0, 120));
+
             var boundaryMatch = contentType.match(/boundary=(.+)/);
             if (!boundaryMatch) {
-                jsonResponse(res, 400, { success: false, message: 'Expected multipart/form-data' });
+                slog('ERROR: No boundary found');
+                jsonResponse(res, 400, { success: false, message: 'Expected multipart/form-data', log: LOG });
                 return;
             }
             var boundary = boundaryMatch[1];
+            slog('Boundary: ' + boundary.substring(0, 40));
 
             // Read raw body
             var chunks = [];
@@ -381,45 +427,95 @@ async function handleAPI(req, res) {
                 req.on('error', reject);
             });
             var body = Buffer.concat(chunks).toString('binary');
+            slog('Total body length (chars): ' + body.length);
+            slog('Body starts with: ' + body.substring(0, 80).replace(/\r/g, '\\r').replace(/\n/g, '\\n'));
+
             var parsed = parseMultipart(body, boundary);
             var fields = parsed.fields;
             var files = parsed.files;
+            slog('Fields count: ' + Object.keys(fields).length);
+            slog('Files count: ' + files.length);
+            Object.keys(fields).forEach(function(k) {
+                slog('  Field "' + k + '": ' + (fields[k] || '').substring(0, 60));
+            });
+            files.forEach(function(f, fi) {
+                slog('  File[' + fi + '] field="' + f.field + '" filename="' + f.filename + '" type="' + f.contentType + '" data.length=' + (f.data ? f.data.length : 0));
+            });
 
             // Validate
             var name = (fields.name || '').trim();
             var category = (fields.category || '').trim();
-            if (!name) { jsonResponse(res, 400, { success: false, message: 'Product name is required' }); return; }
-            if (!category) { jsonResponse(res, 400, { success: false, message: 'Category is required' }); return; }
+            if (!name) { slog('ERROR: No name'); jsonResponse(res, 400, { success: false, message: 'Product name is required', log: LOG }); return; }
+            if (!category) { slog('ERROR: No category'); jsonResponse(res, 400, { success: false, message: 'Category is required', log: LOG }); return; }
+            slog('Name: "' + name + '"  Category: "' + category + '"');
 
             // Read existing products
             var existingContent = fs.readFileSync(PRODUCTS_FILE, 'utf8');
             var existingProducts = parseProductsFile(existingContent);
             if (!Array.isArray(existingProducts)) existingProducts = [];
+            slog('Existing product count: ' + existingProducts.length);
 
             // Generate ID
             var newId = generateProductId(existingProducts, category);
+            slog('Generated ID: ' + newId);
 
             // Create folder
             var productDir = path.join(ROOT, 'assets', 'images', 'products', category, newId);
-            fs.mkdirSync(productDir, { recursive: true });
+            slog('Product dir: ' + productDir);
+            slog('ROOT: ' + ROOT);
+            try {
+                fs.mkdirSync(productDir, { recursive: true });
+                slog('mkdirSync OK');
+            } catch (mkdirErr) {
+                slog('mkdirSync FAILED: ' + mkdirErr.message + ' | code: ' + mkdirErr.code);
+                throw mkdirErr;
+            }
 
-            // Save images as 1.webp, 2.webp, etc.
+            // Verify folder exists
+            slog('fs.existsSync(productDir) after mkdir: ' + fs.existsSync(productDir));
+
+            // Save images — try webp conversion, fall back to raw
             var imagePaths = [];
             var imgIndex = 1;
             var imageFiles = files.filter(function(f) { return f.field === 'images'; });
+            slog('Image files filtered by field="images": ' + imageFiles.length);
+
             for (var i = 0; i < imageFiles.length; i++) {
-                var ext = path.extname(imageFiles[i].filename).toLowerCase();
+                var ext = path.extname(imageFiles[i].filename).toLowerCase() || '.jpg';
                 var outputName = imgIndex + '.webp';
                 var outputPath = path.join(productDir, outputName);
+                slog('Processing file[' + i + ']: "' + imageFiles[i].filename + '" ext="' + ext + '" data.length=' + imageFiles[i].data.length);
+
                 try {
+                    slog('  Attempting sharp.webp() to: ' + outputPath);
                     await sharp(imageFiles[i].data).webp({ quality: 85 }).toFile(outputPath);
-                    imagePaths.push('assets/images/products/' + category + '/' + newId + '/' + outputName);
+                    slog('  sharp.webp() SUCCEEDED');
+                    var savedPath = 'assets/images/products/' + category + '/' + newId + '/' + outputName;
+                    slog('  Checking fs.existsSync("' + outputPath + '"): ' + fs.existsSync(outputPath));
+                    imagePaths.push(savedPath);
+                    slog('  Added to imagePaths: ' + savedPath);
                     imgIndex++;
                 } catch (imgErr) {
-                    // If sharp fails (e.g. unsupported format), skip
-                    console.error('Image conversion error:', imgErr.message);
+                    slog('  sharp.webp() FAILED: ' + imgErr.message + ' | name: ' + imgErr.name + ' | code: ' + imgErr.code);
+                    slog('  Attempting raw fallback...');
+                    try {
+                        var rawName = imgIndex + ext;
+                        var rawPath = path.join(productDir, rawName);
+                        slog('  Raw write to: ' + rawPath);
+                        fs.writeFileSync(rawPath, imageFiles[i].data);
+                        slog('  Raw write SUCCEEDED');
+                        var rawSavedPath = 'assets/images/products/' + category + '/' + newId + '/' + rawName;
+                        slog('  fs.existsSync(rawPath): ' + fs.existsSync(rawPath));
+                        imagePaths.push(rawSavedPath);
+                        slog('  Added raw to imagePaths: ' + rawSavedPath);
+                        imgIndex++;
+                    } catch (rawErr) {
+                        slog('  Raw fallback ALSO FAILED: ' + rawErr.message + ' | code: ' + rawErr.code);
+                    }
                 }
             }
+
+            slog('Final imagePaths: ' + JSON.stringify(imagePaths));
 
             // Build product entry
             var newProduct = {
@@ -457,18 +553,139 @@ async function handleAPI(req, res) {
             // Write
             var newContent = generateProductsJS(existingProducts);
             fs.writeFileSync(PRODUCTS_FILE, newContent, 'utf-8');
+            slog('products.js written successfully');
 
+            slog('=== /api/products POST completed successfully ===');
             jsonResponse(res, 200, {
                 success: true,
                 message: 'Product created successfully',
                 product: newProduct,
                 productCount: existingProducts.length,
-                backup: path.basename(backupPath)
+                backup: path.basename(backupPath),
+                log: LOG
             });
         } catch (err) {
+            slog('UNCAUGHT ERROR: ' + err.message + ' | stack: ' + (err.stack || '').substring(0, 300));
             console.error('Product creation error:', err);
-            jsonResponse(res, 500, { success: false, message: err.message });
+            jsonResponse(res, 500, { success: false, message: err.message, log: LOG });
         }
+        return;
+    }
+
+    // ── Product Images API ──
+    if (pathname === '/api/product-images') {
+        // POST — upload new images for an existing product
+        if (req.method === 'POST') {
+            var LOG2 = [];
+            function slog2(m) { LOG2.push(m); console.log('[UPLOAD-IMAGES] ' + m); }
+            try {
+                slog2('=== /api/product-images POST started ===');
+                var cType = req.headers['content-type'] || '';
+                slog2('Content-Type: ' + cType.substring(0, 120));
+                var bMatch = cType.match(/boundary=(.+)/);
+                if (!bMatch) { jsonResponse(res, 400, { success: false, message: 'Expected multipart/form-data', log: LOG2 }); return; }
+                var boundary = bMatch[1];
+                slog2('Boundary: ' + boundary.substring(0, 40));
+                var chunks = [];
+                req.on('data', function(c) { chunks.push(c); });
+                await new Promise(function(resolve, reject) { req.on('end', resolve); req.on('error', reject); });
+                var body = Buffer.concat(chunks).toString('binary');
+                slog2('Total body length: ' + body.length);
+                var parsed = parseMultipart(body, boundary);
+                var fields = parsed.fields;
+                var files = parsed.files;
+                slog2('Fields: ' + Object.keys(fields).length + ', Files: ' + files.length);
+                files.forEach(function(f, fi) {
+                    slog2('  File[' + fi + '] field="' + f.field + '" filename="' + f.filename + '" data.length=' + (f.data ? f.data.length : 0));
+                });
+
+                var productId = (fields.productId || '').trim();
+                var category = (fields.category || '').trim();
+                slog2('productId: "' + productId + '"  category: "' + category + '"');
+                if (!productId || !category) {
+                    jsonResponse(res, 400, { success: false, message: 'productId and category required', log: LOG2 });
+                    return;
+                }
+
+                var productDir = path.join(ROOT, 'assets', 'images', 'products', category, productId);
+                slog2('Product dir: ' + productDir);
+                slog2('ROOT: ' + ROOT);
+                fs.mkdirSync(productDir, { recursive: true });
+                slog2('mkdirSync OK');
+                slog2('fs.existsSync: ' + fs.existsSync(productDir));
+
+                // Determine next available index
+                var existing = [];
+                try { existing = fs.readdirSync(productDir); } catch(e) {}
+                var maxIdx = 0;
+                for (var ei = 0; ei < existing.length; ei++) {
+                    var m = existing[ei].match(/^(\d+)\./);
+                    if (m) { var n = parseInt(m[1]); if (n > maxIdx) maxIdx = n; }
+                }
+                var imgIndex = maxIdx + 1;
+                var imagePaths = [];
+                var imageFiles = files.filter(function(f) { return f.field === 'images'; });
+
+                for (var i = 0; i < imageFiles.length; i++) {
+                    var ext = path.extname(imageFiles[i].filename).toLowerCase() || '.jpg';
+                    var outputName = imgIndex + '.webp';
+                    var outputPath = path.join(productDir, outputName);
+                    slog2('Processing file[' + i + ']: "' + imageFiles[i].filename + '" -> ' + outputPath + ' (len=' + imageFiles[i].data.length + ')');
+                    try {
+                        slog2('  Attempting sharp.webp()...');
+                        await sharp(imageFiles[i].data).webp({ quality: 85 }).toFile(outputPath);
+                        slog2('  sharp SUCCEEDED');
+                        imagePaths.push('assets/images/products/' + category + '/' + productId + '/' + outputName);
+                        imgIndex++;
+                    } catch (imgErr) {
+                        slog2('  sharp FAILED: ' + imgErr.message + ' | code: ' + imgErr.code);
+                        try {
+                            var rawName = imgIndex + ext;
+                            var rawPath = path.join(productDir, rawName);
+                            slog2('  Raw fallback to: ' + rawPath);
+                            fs.writeFileSync(rawPath, imageFiles[i].data);
+                            slog2('  Raw SUCCEEDED');
+                            slog2('  fs.existsSync(rawPath): ' + fs.existsSync(rawPath));
+                            imagePaths.push('assets/images/products/' + category + '/' + productId + '/' + rawName);
+                            imgIndex++;
+                        } catch (rawErr) {
+                            slog2('  Raw ALSO FAILED: ' + rawErr.message);
+                        }
+                    }
+                }
+
+                slog2('Final imagePaths: ' + JSON.stringify(imagePaths));
+                slog2('=== /api/product-images POST done ===');
+                jsonResponse(res, 200, { success: true, paths: imagePaths, count: imagePaths.length, log: LOG2 });
+            } catch (err) {
+                slog2('UNCAUGHT: ' + err.message);
+                console.error('Product image upload error:', err);
+                jsonResponse(res, 500, { success: false, message: err.message, log: LOG2 });
+            }
+            return;
+        }
+
+        // DELETE — remove an image file
+        if (req.method === 'DELETE') {
+            try {
+                var body = await getBody(req);
+                var imagePath = (body.path || '').trim();
+                if (!imagePath) { jsonResponse(res, 400, { success: false, message: 'path required' }); return; }
+                var absPath = path.join(ROOT, decodeURIComponent(imagePath));
+                if (absPath.indexOf(ROOT) !== 0) { jsonResponse(res, 403, { success: false, message: 'Forbidden' }); return; }
+                try {
+                    fs.unlinkSync(absPath);
+                    jsonResponse(res, 200, { success: true, message: 'Image deleted' });
+                } catch (unlinkErr) {
+                    jsonResponse(res, 404, { success: false, message: 'File not found: ' + imagePath });
+                }
+            } catch (err) {
+                jsonResponse(res, 500, { success: false, message: err.message });
+            }
+            return;
+        }
+
+        jsonResponse(res, 404, { success: false, message: 'Unknown method' });
         return;
     }
 
