@@ -16,6 +16,7 @@
 <!-- ═══════════════════════════════════════════════════════════════
      AUTH CHECK — runs before any content renders (blocking)
      ═══════════════════════════════════════════════════════════════ -->
+<script src="assets/js/config.js"></script>
 <script src="assets/js/admin-auth.js"></script>
 <script>
 (function(){
@@ -1753,10 +1754,15 @@
 </div>
 
 <!-- Scripts -->
-<script src="data/products.js"></script>
-<script src="data/categories.js"></script>
-<script src="data/banners.js"></script>
-<script src="data/settings.js"></script>
+<script>
+(function(){
+    var baseUrl = typeof API_BASE_URL !== 'undefined' && API_BASE_URL ? API_BASE_URL : '';
+    var files = ['data/products.js','data/categories.js','data/banners.js','data/settings.js'];
+    for (var i = 0; i < files.length; i++) {
+        document.write('<script src="' + baseUrl + '/' + files[i] + '?_t=' + Date.now() + '"><\/script>');
+    }
+})();
+</script>
 <script src="assets/js/script.js"></script>
 <script src="assets/js/admin-toast.js"></script>
 <script src="assets/js/admin-categories.js"></script>
@@ -1798,6 +1804,19 @@ let pendingSave = false;
 
 // Drag state
 let dragSrcIdx = null;
+
+// ═══════════════════════════════════════════════
+//  IMAGE URL HELPER
+// ═══════════════════════════════════════════════
+
+function productImageUrl(path) {
+    if (!path) return '';
+    if (path.startsWith('data:') || path.startsWith('http')) return path;
+    var base = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+    if (!base) return path;
+    return base.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+}
+window.productImageUrl = productImageUrl;
 
 // ═══════════════════════════════════════════════
 //  PERSISTENCE
@@ -1985,7 +2004,7 @@ function renderTable() {
         var p = filtered[i];
         var isDraft = p.price === 0 && p.stock === 0;
         var isSelected = selectedIds.has(p.id);
-        var imgSrc = (p.images && p.images[0]) ? p.images[0] : '';
+        var imgSrc = (p.images && p.images[0]) ? productImageUrl(p.images[0]) : '';
         var imgHtml = imgSrc
             ? '<img src="' + esc(imgSrc) + '" alt="" class="prod-thumb" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="prod-thumb-placeholder" style="display:none"><i class="fas fa-image"></i></div>'
             : '<div class="prod-thumb-placeholder"><i class="fas fa-image"></i></div>';
@@ -2254,7 +2273,7 @@ function renderGallery(images) {
         var isCover = i === coverIdx;
         html += '<div class="gallery-item' + (isCover ? ' is-cover' : '') + '" draggable="true" data-path="' + esc(path) + '">';
         html += '<span class="g-order">' + (i + 1) + '</span>';
-        html += '<img src="' + esc(path) + '" alt="Image ' + (i + 1) + '" onerror="this.parentElement.classList.add(\'img-broken\');this.outerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#ccc;font-size:.65rem>Broken</div>\'">';
+        html += '<img src="' + esc(productImageUrl(path)) + '" alt="Image ' + (i + 1) + '" onerror="this.parentElement.classList.add(\'img-broken\');this.outerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#ccc;font-size:.65rem>Broken</div>\'">';
         html += '<span class="g-cover">Cover</span>';
         html += '<div class="g-actions">';
         if (!isCover) html += '<button type="button" class="g-action-cover" title="Set as Cover"><i class="fas fa-crown"></i></button>';
@@ -2462,6 +2481,8 @@ function createProduct() {
     var saveBtn = document.getElementById('npSaveBtn');
     saveButtonState(saveBtn, 'saving');
 
+    var url = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/api/products';
+
     var formData = new FormData();
     formData.append('name', name);
     formData.append('category', category);
@@ -2470,55 +2491,43 @@ function createProduct() {
     formData.append('oldPrice', document.getElementById('npOldPrice').value);
     formData.append('stock', document.getElementById('npStock').value);
     formData.append('description', document.getElementById('npDescription').value.trim());
-    formData.append('featured', document.getElementById('npFeatured').checked);
-    formData.append('bestSeller', document.getElementById('npBestSeller').checked);
-    formData.append('newArrival', document.getElementById('npNewArrival').checked);
-    formData.append('onSale', document.getElementById('npOnSale').checked);
-    formData.append('tags', document.getElementById('npTags').value);
+    formData.append('featured', document.getElementById('npFeatured').checked ? 'true' : 'false');
+    formData.append('bestSeller', document.getElementById('npBestSeller').checked ? 'true' : 'false');
+    formData.append('newArrival', document.getElementById('npNewArrival').checked ? 'true' : 'false');
+    formData.append('onSale', document.getElementById('npOnSale').checked ? 'true' : 'false');
+    formData.append('tags', document.getElementById('npTags').value.trim());
 
     for (var i = 0; i < npFiles.length; i++) {
         formData.append('images', npFiles[i]);
     }
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/products', true);
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            var resp = JSON.parse(xhr.responseText);
-            if (resp.success) {
-                statusEl.textContent = '';
-                closeNewProductModal();
-                baseProducts.push(resp.product);
+    fetch(url, { method: 'POST', body: formData })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                newProducts.push(data.product);
+                saveOverrides();
                 products = mergeAndGetProducts();
                 renderTable();
                 updateStats();
-                saveButtonState(saveBtn, 'success', 'Product Saved Successfully');
+                closeNewProductModal();
+                saveButtonState(saveBtn, 'success', 'Product Created Successfully');
+                statusEl.textContent = '';
             } else {
-                statusEl.textContent = resp.message || 'Failed to create product';
-                saveButtonState(saveBtn, 'error', resp.message || 'Failed to create product');
+                saveButtonState(saveBtn, 'error', data.message || 'Creation failed');
+                statusEl.textContent = data.message || 'Creation failed';
             }
-        } else {
-            try {
-                var resp = JSON.parse(xhr.responseText);
-                statusEl.textContent = resp.message || 'Server error';
-                saveButtonState(saveBtn, 'error', resp.message || 'Server error (' + xhr.status + ')');
-            } catch(e) {
-                statusEl.textContent = 'Server error (' + xhr.status + ')';
-                saveButtonState(saveBtn, 'error', 'Server error (' + xhr.status + ')');
-            }
-        }
-    };
-    xhr.onerror = function() {
-        statusEl.textContent = 'Network error';
-        saveButtonState(saveBtn, 'error', 'Network error');
-    };
-    xhr.send(formData);
+        })
+        .catch(function(err) {
+            saveButtonState(saveBtn, 'error', 'Network error: ' + err.message);
+            statusEl.textContent = 'Network error: ' + err.message;
+        });
 }
 
 function loadProducts(callback) {
-    // Reload products.js by fetching it fresh, then re-init
+    var baseUrl = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var script = document.createElement('script');
-    script.src = 'data/products.js?_t=' + Date.now();
+    script.src = baseUrl + '/data/products.js?_t=' + Date.now();
     script.onload = function() {
         baseProducts = JSON.parse(JSON.stringify(PRODUCTS));
         products = mergeAndGetProducts();
@@ -2865,8 +2874,9 @@ function saveToServer() {
     saveButtonState(btn, 'saving');
 
     var finalList = buildFinalProductList();
+    var url = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/api/save';
 
-    fetch('/api/save', {
+    fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ products: finalList })
@@ -2883,38 +2893,41 @@ function saveToServer() {
             renderTable();
             updateStats();
             updateServerStatus(true);
-            saveButtonState(btn, 'success', 'Product Saved Successfully');
+            saveButtonState(btn, 'success', 'Saved ' + data.productCount + ' products');
         } else {
-            saveButtonState(btn, 'error', data.message || 'Failed to save');
+            saveButtonState(btn, 'error', data.message || 'Save failed');
         }
     })
     .catch(function(err) {
-        saveButtonState(btn, 'error', 'Save failed. Is the admin server running?');
+        saveButtonState(btn, 'error', 'Save failed: ' + err.message);
     });
 }
 
 function checkServer() {
-    fetch('/api/health', { method: 'GET' })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        updateServerStatus(true);
-    })
-    .catch(function() {
-        updateServerStatus(false);
-    });
+    var url = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/api/health';
+
+    fetch(url)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            updateServerStatus(true, data.productCount || 0);
+        })
+        .catch(function() {
+            updateServerStatus(false);
+        });
 }
 
-function updateServerStatus(online) {
+function updateServerStatus(online, count) {
     var dot = document.querySelector('#serverStatus .status-dot');
     var text = document.getElementById('statusText');
+    var el = document.getElementById('serverStatus');
     if (online) {
         dot.style.background = '#27ae60';
-        text.textContent = 'Server Online';
-        document.getElementById('serverStatus').style.color = '#27ae60';
+        text.textContent = 'Server Online' + (count !== undefined ? ' (' + count + ' products)' : '');
+        el.style.color = '#27ae60';
     } else {
         dot.style.background = '#e74c3c';
         text.textContent = 'Server Offline';
-        document.getElementById('serverStatus').style.color = '#e74c3c';
+        el.style.color = '#e74c3c';
     }
 }
 

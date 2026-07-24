@@ -4,7 +4,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const sharp = require('sharp');
 
-const PORT = 3456;
+const PORT = process.env.PORT || 3456;
 const ROOT = path.resolve(__dirname, '..');
 const PRODUCTS_FILE = path.join(ROOT, 'data', 'products.js');
 const CATEGORIES_FILE = path.join(ROOT, 'data', 'categories.js');

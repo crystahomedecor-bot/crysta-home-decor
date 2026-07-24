@@ -1,5 +1,13 @@
 function esc(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
+function imgUrl(path) {
+    if (!path) return '';
+    if (path.startsWith('data:') || path.startsWith('http') || path.startsWith('blob:')) return path;
+    var base = typeof IMAGE_BASE_URL !== 'undefined' ? IMAGE_BASE_URL : (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '');
+    if (!base) return path;
+    return base.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+}
+
 var banners = [];
 
 function initBanners() {
@@ -23,7 +31,7 @@ function renderBanners() {
         var imgSrc = b.imageDesktop || '';
         html += '<tr draggable="true" data-id="' + esc(b.id) + '">';
         html += '<td>' + (imgSrc
-            ? '<img src="' + esc(imgSrc) + '" class="cat-thumb" alt="" onerror="this.outerHTML=\'<div class=cat-thumb-placeholder><i class=&quot;fas fa-image&quot;></i></div>\'">'
+            ? '<img src="' + esc(imgUrl(imgSrc)) + '" class="cat-thumb" alt="" onerror="this.outerHTML=\'<div class=cat-thumb-placeholder><i class=&quot;fas fa-image&quot;></i></div>\'">'
             : '<div class="cat-thumb-placeholder"><i class="fas fa-image"></i></div>') + '</td>';
         html += '<td><strong>' + esc(b.title) + '</strong></td>';
         html += '<td>' + esc(b.buttonText || '-') + '</td>';
@@ -91,7 +99,7 @@ function closeBannerEditor() {
 function renderBannerPreview(type, path) {
     var container = document.getElementById('be' + type.charAt(0).toUpperCase() + type.slice(1) + 'Preview');
     if (path) {
-        container.innerHTML = '<img src="' + esc(path) + '" class="cat-thumb-preview" alt="" onerror="this.innerHTML=\'<i class=\\\\"fas fa-image-broken\\\\"></i>\'">';
+        container.innerHTML = '<img src="' + esc(imgUrl(path)) + '" class="cat-thumb-preview" alt="" onerror="this.innerHTML=\'<i class=\\\\"fas fa-image-broken\\\\"></i>\'">';
     } else {
         container.innerHTML = '<div class="cat-thumb-placeholder-preview"><i class="fas fa-image"></i></div>';
     }
@@ -138,8 +146,9 @@ function saveBanner() {
         }
     }
 
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/banners?action=save', true);
+    xhr.open('POST', apiBase + '/api/banners?action=save', true);
     xhr.onload = function() {
         if (xhr.status === 200) {
             var resp = JSON.parse(xhr.responseText);
@@ -168,8 +177,9 @@ function saveBanner() {
 
 function deleteBanner(id) {
     if (!confirm('Delete this banner?')) return;
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/banners?action=delete', true);
+    xhr.open('POST', apiBase + '/api/banners?action=delete', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() {
         if (xhr.status === 200) {
@@ -184,8 +194,9 @@ function deleteBanner(id) {
 }
 
 function reloadBanners(callback) {
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var script = document.createElement('script');
-    script.src = 'data/banners.js?_t=' + Date.now();
+    script.src = apiBase + '/data/banners.js?_t=' + Date.now();
     script.onload = function() { if (callback) callback(); };
     document.head.appendChild(script);
 }
@@ -197,7 +208,7 @@ function openBannerPreview(id) {
     }
     if (!b) return;
     var html = '<div style="position:relative;width:100%;max-width:800px;margin:0 auto;border-radius:10px;overflow:hidden;background:#f0f0f0;min-height:200px;background-size:cover;background-position:center"';
-    if (b.imageDesktop) html += ' background-image:url(' + esc(b.imageDesktop) + ')';
+    if (b.imageDesktop) html += ' background-image:url(' + esc(imgUrl(b.imageDesktop)) + ')';
     html += '>';
     if (b.overlayOpacity !== undefined) {
         html += '<div style="position:absolute;inset:0;background:rgba(0,0,0,' + b.overlayOpacity + ')"></div>';

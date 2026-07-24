@@ -1,5 +1,13 @@
 function esc(s) { return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
+function imgUrl(path) {
+    if (!path) return '';
+    if (path.startsWith('data:') || path.startsWith('http') || path.startsWith('blob:')) return path;
+    var base = typeof IMAGE_BASE_URL !== 'undefined' ? IMAGE_BASE_URL : (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '');
+    if (!base) return path;
+    return base.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+}
+
 var categories = [];
 var catEditSlug = null;
 
@@ -60,7 +68,7 @@ function renderCategories() {
         }
         html += '<tr draggable="true" data-slug="' + esc(c.slug) + '">';
         html += '<td>' + (hasImage
-            ? '<img src="' + esc(c.image) + '" class="cat-thumb" alt="" onerror="this.outerHTML=\'<div class=cat-thumb-placeholder><i class=&quot;fas fa-image&quot;></i></div>\'">'
+            ? '<img src="' + esc(imgUrl(c.image)) + '" class="cat-thumb" alt="" onerror="this.outerHTML=\'<div class=cat-thumb-placeholder><i class=&quot;fas fa-image&quot;></i></div>\'">'
             : '<div class="cat-thumb-placeholder"><i class="fas fa-image"></i></div>') + '</td>';
         html += '<td><strong>' + esc(c.name) + '</strong></td>';
         html += '<td><code>' + esc(c.slug) + '</code></td>';
@@ -123,7 +131,7 @@ function renderCatThumbPreview(path) {
     var container = document.getElementById('ceThumbPreview');
     var removeBtn = document.getElementById('ceRemoveThumb');
     if (path && path !== '') {
-        container.innerHTML = '<img src="' + esc(path) + '" class="cat-thumb-preview" alt="" onerror="this.outerHTML=\'<div class=cat-thumb-placeholder-preview><i class=&quot;fas fa-image&quot;></i></div>\'">';
+        container.innerHTML = '<img src="' + esc(imgUrl(path)) + '" class="cat-thumb-preview" alt="" onerror="this.outerHTML=\'<div class=cat-thumb-placeholder-preview><i class=&quot;fas fa-image&quot;></i></div>\'">';
         removeBtn.style.display = '';
     } else {
         container.innerHTML = '<div class="cat-thumb-placeholder-preview"><i class="fas fa-image"></i></div>';
@@ -221,8 +229,9 @@ function saveCategory() {
         formData.append('existingImage', existingImg);
     }
 
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/categories?action=save', true);
+    xhr.open('POST', apiBase + '/api/categories?action=save', true);
     xhr.onload = function() {
         if (xhr.status === 200) {
             var resp = JSON.parse(xhr.responseText);
@@ -276,8 +285,9 @@ function openDeleteCategory(slug) {
 function confirmDeleteCategory() {
     var slug = document.getElementById('catDelConfirmBtn').dataset.slug;
     if (!slug) return;
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/categories?action=delete', true);
+    xhr.open('POST', apiBase + '/api/categories?action=delete', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() {
         if (xhr.status === 200) {
@@ -301,8 +311,9 @@ function closeCatDeleteModal() {
 }
 
 function reloadCategories(callback) {
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var script = document.createElement('script');
-    script.src = 'data/categories.js?_t=' + Date.now();
+    script.src = apiBase + '/data/categories.js?_t=' + Date.now();
     script.onload = function() { if (callback) callback(); };
     document.head.appendChild(script);
 }
@@ -447,8 +458,9 @@ function addCategoryEventListeners() {
         }
         var slugs = [];
         tbody.querySelectorAll('tr[data-slug]').forEach(function(row) { slugs.push(row.dataset.slug); });
+        var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/api/categories?action=reorder', true);
+        xhr.open('POST', apiBase + '/api/categories?action=reorder', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onload = function() {
             if (xhr.status === 200) reloadCategories(function() { initCategories(); });

@@ -64,8 +64,9 @@ function saveSettings() {
     var saveBtn = document.getElementById('settingsSaveBtn');
     saveButtonState(saveBtn, 'saving');
 
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/settings', true);
+    xhr.open('POST', apiBase + '/api/settings', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onload = function() {
         if (xhr.status === 200) {
@@ -100,8 +101,9 @@ function handleSettingsImageUpload(inputId, settingKey) {
     formData.append('key', settingKey);
     formData.append('section', settingsTab);
 
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/upload-setting-image', true);
+    xhr.open('POST', apiBase + '/api/upload-setting-image', true);
     xhr.onload = function() {
         if (xhr.status === 200) {
             var resp = JSON.parse(xhr.responseText);
@@ -117,8 +119,9 @@ function handleSettingsImageUpload(inputId, settingKey) {
 }
 
 function reloadSettings(callback) {
+    var apiBase = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
     var script = document.createElement('script');
-    script.src = 'data/settings.js?_t=' + Date.now();
+    script.src = apiBase + '/data/settings.js?_t=' + Date.now();
     script.onload = function() {
         settings = JSON.parse(JSON.stringify(SETTINGS));
         if (callback) callback();
