@@ -301,7 +301,10 @@ function serveStatic(req, res) {
             return;
         }
         var ext = path.extname(filePath).toLowerCase();
-        res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+        res.writeHead(200, { 
+            'Content-Type': MIME[ext] || 'application/octet-stream',
+            'Access-Control-Allow-Origin': '*'
+        });
         res.end(data);
     });
 }
