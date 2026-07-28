@@ -150,32 +150,22 @@ const PRODUCTS = [
         newArrival: true,
         onSale: false,
         tags: ['wall clock', 'clock', 'wall', 'clock wall', 'wallclokc'],
+    },
+    {
+        id: 'bottle-001',
+        name: 'Tambler',
+        category: 'bottles',
+        subcategory: 'steel',
+        price: 850,
+        oldPrice: 1399,
+        stock: 12,
+        images: ['assets/images/products/bottles/steel/bottle-001/1.webp'],
+        description: 'steel Tambler , premium Quality',
+        specifications: {},
+        featured: false,
+        bestSeller: true,
+        newArrival: false,
+        onSale: false,
+        tags: ['bottle', 'steel', 'tambler'],
     }
 ];
-{
-    id: "bottle-001",
-    name: "Steel Tumbler",
-    category: "bottles",
-
-    price: 499,
-    oldPrice: 699,
-
-    stock: 20,
-
-    status: "active",
-
-    images: [
-        "assets/images/products/bottles/steel-001/1.webp",
-    ],
-
-    description: "Premium stainless steel tumbler.",
-
-    specifications: { stainless: "Yes" },
-
-    featured: false,
-    bestSeller: true,
-    newArrival: true,
-    onSale: false,
-
-    tags: [tambler]
-},
